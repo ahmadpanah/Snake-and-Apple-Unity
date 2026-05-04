@@ -2,12 +2,10 @@ using UnityEngine;
 
 public class GameHandler : MonoBehaviour
 {
+    private LevelGrid levelGrid;
     void Start()
-    {
-        GameObject snakeHeadGameObject = new GameObject();
-        SpriteRenderer snakeSpriteRenderer =  snakeHeadGameObject.AddComponent<SpriteRenderer>();
-        snakeSpriteRenderer.sprite = GameAssets.i.snakeHeadSprite;
-
+    {   
+        levelGrid = new LevelGrid(20,20);
     }
     void Update()
     {
