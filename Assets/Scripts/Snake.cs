@@ -14,6 +14,7 @@ public class Snake : MonoBehaviour
 
     private int snakeBodySize;
     private List<Vector2Int> snakeMovePositionList;
+    private List<Transform> snakeBodyTransformList;
 
     public void Setup(LevelGrid levelGrid)
     {
@@ -27,7 +28,8 @@ public class Snake : MonoBehaviour
         gridMoveDirection = new Vector2Int(1, 0);
 
         snakeMovePositionList = new List<Vector2Int>();
-        snakeBodySize = 1;
+        snakeBodySize = 0;
+        snakeBodyTransformList = new List<Transform>();
     }
     private void Update()
     {
@@ -73,6 +75,12 @@ public class Snake : MonoBehaviour
         }
     }
 
+    private void CreateSnakeBody()
+    {
+        GameObject snakeBodyGameObject = new GameObject("SnakeBody", typeof(SpriteRenderer));
+        snakeBodyGameObject.GetComponent<SpriteRenderer>().sprite = GameAssets.i.snakeBodySprite;
+        snakeBodyTransformList.Add(snakeBodyGameObject.transform);
+    }
     private void HandleGridMovement()
     {
         gridMoveTimer += Time.deltaTime;
@@ -81,6 +89,12 @@ public class Snake : MonoBehaviour
             gridMoveTimer -= gridMoveTimerMax;
             snakeMovePositionList.Insert(0, gridPosition);
             gridPosition += gridMoveDirection;
+            bool snakeAteFood = levelGrid.TrySnakeEatFood(gridPosition);
+            if (snakeAteFood)
+            {
+                snakeBodySize++;
+                CreateSnakeBody();
+            }
             if (snakeMovePositionList.Count >= snakeBodySize + 1)
             {
                 snakeMovePositionList.RemoveAt(snakeMovePositionList.Count - 1);
@@ -94,7 +108,7 @@ public class Snake : MonoBehaviour
             transform.position = new Vector3(gridPosition.x, gridPosition.y);
             transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(gridMoveDirection) - 90);
 
-            levelGrid.SnakeMoved(gridPosition);
+            levelGrid.TrySnakeEatFood(gridPosition);
         }
     }
     private float GetAngleFromVector(Vector2Int dir)
@@ -107,5 +121,12 @@ public class Snake : MonoBehaviour
     public Vector2Int GetGridPosition()
     {
         return gridPosition;
+    }
+
+    public List<Vector2Int> GetFullSnakeGridPosition()
+    {
+        List<Vector2Int> gridPositionList = new List<Vector2Int>() { gridPosition};
+        gridPositionList.AddRange(snakeMovePositionList);
+        return gridPositionList;
     }
 }
