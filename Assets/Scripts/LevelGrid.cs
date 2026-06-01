@@ -14,18 +14,21 @@ public class LevelGrid
     {
         this.width = width;
         this.height = height;
-
-        SpawnFood();
     }
 
     public void Setup(Snake snake)
     {
         this.snake = snake;
+        SpawnFood();
     }
 
     private void SpawnFood()
     {
-        foodGridPosition = new Vector2Int(Random.Range(0, width), Random.Range(0, height));
+        do
+        {
+            foodGridPosition = new Vector2Int(Random.Range(0, width), Random.Range(0, height));
+        } while (snake.GetGridPosition() == foodGridPosition);
+
         foodGameObject = new GameObject("Food", typeof(SpriteRenderer));
         foodGameObject.GetComponent<SpriteRenderer>().sprite = GameAssets.i.foodSprite;
         foodGameObject.transform.position = new Vector3(foodGridPosition.x, foodGridPosition.y);
